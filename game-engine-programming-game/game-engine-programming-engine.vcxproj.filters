@@ -33,9 +33,15 @@
     <ClCompile Include="..\game-engine-core\src\IApplication.cpp">
       <Filter>Source Files\core\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\game-engine-core\src\Timer.cpp">
+      <Filter>Source Files\core\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game-engine-core\include\IApplication.h">
+      <Filter>Header Files\core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game-engine-core\include\Timer.h">
       <Filter>Header Files\core\include</Filter>
     </ClInclude>
   </ItemGroup>

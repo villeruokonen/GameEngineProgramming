@@ -133,10 +133,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\game-engine-core\src\IApplication.cpp" />
+    <ClCompile Include="..\game-engine-core\src\Timer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game-engine-core\include\IApplication.h" />
+    <ClInclude Include="..\game-engine-core\include\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

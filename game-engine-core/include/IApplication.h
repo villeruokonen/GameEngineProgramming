@@ -11,7 +11,8 @@
 #include <iterator>
 #include <string_view>
 
-#include "../include/Timer.h"
+#include "Timer.h"
+#include "IRenderer.h"
 
 class IApplication
 {
@@ -34,6 +35,8 @@ public:
 
 	static IApplication* GetApp() { return m_pApp;  }
 
+	inline IRenderer* GetRenderer() { return m_pRenderer.get(); }
+
 	static void Debug(const wchar_t* msg);
 	static void Debug(const char* msg);
 	static void Debug(const std::string& msg);
@@ -46,14 +49,16 @@ private:
 	static long WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
-	int32_t					m_iWidth;
-	int32_t					m_iHeight;
+	int32_t						m_iWidth;
+	int32_t						m_iHeight;
 
-	bool					m_bActive;
+	bool						m_bActive;
 
-	Timer					m_Timer;
+	Timer						m_Timer;
 
-	HWND					m_Window;
+	HWND						m_Window;
 
-	static IApplication*	m_pApp;
+	std::unique_ptr<IRenderer>	m_pRenderer;
+
+	static IApplication*		m_pApp;
 };

@@ -42,6 +42,9 @@
     <ClCompile Include="..\game-engine-core\src\OpenGLRenderer.cpp">
       <Filter>Source Files\core\src</Filter>
     </ClCompile>
+    <ClCompile Include="TheApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game-engine-core\include\IApplication.h">
@@ -54,6 +57,12 @@
       <Filter>Header Files\core\include</Filter>
     </ClInclude>
     <ClInclude Include="..\game-engine-core\include\OpenGLRenderer.h">
+      <Filter>Header Files\core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="TheApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game-engine-core\include\stb_image.h">
       <Filter>Header Files\core\include</Filter>
     </ClInclude>
   </ItemGroup>

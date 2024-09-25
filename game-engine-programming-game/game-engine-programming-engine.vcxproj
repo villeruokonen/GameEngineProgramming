@@ -141,12 +141,15 @@
     <ClCompile Include="..\game-engine-core\src\OpenGLRenderer.cpp" />
     <ClCompile Include="..\game-engine-core\src\Timer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TheApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game-engine-core\include\IApplication.h" />
     <ClInclude Include="..\game-engine-core\include\IRenderer.h" />
     <ClInclude Include="..\game-engine-core\include\OpenGLRenderer.h" />
+    <ClInclude Include="..\game-engine-core\include\stb_image.h" />
     <ClInclude Include="..\game-engine-core\include\Timer.h" />
+    <ClInclude Include="TheApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

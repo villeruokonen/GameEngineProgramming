@@ -1,8 +1,8 @@
-#include "../game-engine-core/include/IApplication.h"
+#include "TheApp.h"
 
 int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, LPSTR cmdLine, int cmdShow)
 {
-	auto app = std::make_unique<IApplication>();
+	auto app = std::make_unique<TheApp>();
 	if(!app->Create(1280, 720, "GAME"))
 	{
 		IApplication::Debug("APP START FAILED");

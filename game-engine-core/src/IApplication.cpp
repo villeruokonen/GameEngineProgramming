@@ -32,8 +32,14 @@ bool IApplication::Create(int32_t resX, int32_t resY, const std::string& title)
 			return false;
 		}
 
-		SetActive(true);
-		return true;
+		// call pure virtual OnCreate
+		if (OnCreate())
+		{
+			SetActive(true);
+			return true;
+		}
+
+		return false;
 	}
 
 	return false;
@@ -71,13 +77,15 @@ void IApplication::Run()
 			// Timed main loop of the app
 
 			// ::Sleep(16);
-			Debug(std::string("FPS: ") + std::to_string(1.0f / GetFrameTime()) + "\n");
 
-			m_pRenderer->Clear({ 0.0f, 1.0f, 0.0f, 1.0f });
+			OnUpdate(m_Timer.GetElapsedSeconds());
+			OnDraw(*m_pRenderer);
+
 			m_pRenderer->Flip();
 		}
 	}
 
+	OnDestroy();
 	m_pRenderer = nullptr;
 }
 

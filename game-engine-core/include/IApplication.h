@@ -24,6 +24,11 @@ public:
 
 	void Run();
 
+	virtual bool OnCreate() = 0;
+	virtual void OnDestroy() = 0;
+	virtual void OnUpdate(float frametime) = 0;
+	virtual void OnDraw(IRenderer& renderer) = 0;
+
 	inline int32_t GetWidth() const { return m_iWidth; }
 	inline int32_t GetHeight() const { return m_iHeight; }
 	inline HWND GetWindow() const { return m_Window; }

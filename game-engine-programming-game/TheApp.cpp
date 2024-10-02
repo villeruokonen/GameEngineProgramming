@@ -11,7 +11,7 @@ bool TheApp::OnCreate()
 {
 	OpenGLRenderer* renderer = GetOpenGLRenderer();
 
-	if(!renderer)
+	if (!renderer)
 	{
 		Debug("Failed to create OpenGL renderer.\n");
 		return false;
@@ -21,7 +21,7 @@ bool TheApp::OnCreate()
 	m_uFragmentShader = renderer->CreateFragmentShaderFromFile("phongshader.frag");
 	m_uProgram = renderer->CreateProgram(m_uVertexShader, m_uFragmentShader);
 
-	if(!m_uVertexShader || !m_uFragmentShader || !m_uProgram)
+	if (!m_uVertexShader || !m_uFragmentShader || !m_uProgram)
 	{
 		Debug("Failed to create program.\n");
 		return false;

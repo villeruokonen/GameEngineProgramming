@@ -15,7 +15,7 @@ void Geometry::Clear()
 	m_arrVertices.clear();
 }
 
-void Geometry::GenSphere(const glm::vec3& radius, 
+void Geometry::GenSphere(const glm::vec3& radius,
 	const glm::vec3& offset, uint32_t rings, uint32_t segments)
 {
 	Clear();
@@ -26,7 +26,7 @@ void Geometry::GenSphere(const glm::vec3& radius,
 	const float deltaRingAngle(glm::pi<float>() / rings);
 	const float deltaSegmentAngle(glm::two_pi<float>() / segments);
 
-	for(uint32_t ring = 0; ring < rings; ++ring)
+	for (uint32_t ring = 0; ring < rings; ++ring)
 	{
 		const float r0 = sinf((ring + 0) * deltaRingAngle);
 		const float r1 = sinf((ring + 1) * deltaRingAngle);
@@ -34,7 +34,7 @@ void Geometry::GenSphere(const glm::vec3& radius,
 		const float y0 = cosf((ring + 0) * deltaRingAngle);
 		const float y1 = cosf((ring + 1) * deltaRingAngle);
 
-		for(uint32_t seg = 0; seg < (segments + 1); ++seg)
+		for (uint32_t seg = 0; seg < (segments + 1); ++seg)
 		{
 			const float angle = seg * deltaSegmentAngle;
 

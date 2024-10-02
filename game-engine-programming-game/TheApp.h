@@ -19,5 +19,7 @@ private:
 	GLuint							m_uFragmentShader;
 	GLuint							m_uProgram;
 
+	GLuint							m_uTexture;
+
 	std::shared_ptr<Geometry>		m_pSphere;
 };

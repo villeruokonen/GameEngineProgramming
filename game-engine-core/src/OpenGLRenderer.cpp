@@ -243,7 +243,7 @@ GLuint OpenGLRenderer::CreateVertexShader(const char* sourceCode)
 	GLint shaderCompiled = 0;
 	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &shaderCompiled);
 
-	if(!shaderCompiled)
+	if (!shaderCompiled)
 	{
 		IApplication::Debug("Failed to compile vertex shader: ");
 		PrintShaderError(shaderHandle);
@@ -304,7 +304,25 @@ GLuint OpenGLRenderer::CreateFragmentShaderFromFile(const std::string_view& file
 
 GLuint OpenGLRenderer::CreateProgram(GLuint vertexShader, GLuint fragmentShader)
 {
-	return GLuint();
+	GLuint programHandle = glCreateProgram();
+
+	glAttachShader(programHandle, fragmentShader);
+	glAttachShader(programHandle, vertexShader);
+
+	glLinkProgram(programHandle);
+
+	GLint linked = 0;
+	glGetProgramiv(programHandle, GL_LINK_STATUS, &linked);
+
+	if (!linked)
+	{
+		IApplication::Debug("Failed to link program: ");
+		PrintProgramError(programHandle);
+		glDeleteProgram(programHandle);
+		programHandle = 0;
+	}
+
+	return programHandle;
 }
 
 void OpenGLRenderer::PrintShaderError(GLuint shader)
@@ -339,7 +357,7 @@ void OpenGLRenderer::PrintProgramError(GLuint program)
 		char* infoLog = new char[infoLogLength + 1];
 		memset(infoLog, 0, infoLogLength + 1);
 
-		glGetProgramInfoLog(program, infoLogLength, & charsWritten, infoLog);
+		glGetProgramInfoLog(program, infoLogLength, &charsWritten, infoLog);
 
 		IApplication::Debug(infoLog);
 

@@ -45,6 +45,9 @@
     <ClCompile Include="TheApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\game-engine-core\src\Geometry.cpp">
+      <Filter>Source Files\core\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game-engine-core\include\IApplication.h">
@@ -65,5 +68,12 @@
     <ClInclude Include="..\game-engine-core\include\stb_image.h">
       <Filter>Header Files\core\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\game-engine-core\include\Geometry.h">
+      <Filter>Header Files\core\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="phongshader.frag" />
+    <None Include="phongshader.vert" />
   </ItemGroup>
 </Project>

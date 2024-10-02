@@ -186,10 +186,10 @@ GLuint OpenGLRenderer::CreateTexture(const std::string_view& filename)
 	int32_t bitsPerPixel = 0;
 	uint8_t* imgData = stbi_load(filename.data(), &width, &height, &bitsPerPixel, STBI_rgb_alpha);
 
-	if (!imgData || !width || height || bitsPerPixel)
+	if (!imgData || !width || !height || !bitsPerPixel)
 	{
 		// failed to load image file
-		IApplication::Debug("Failed to load image");
+		IApplication::Debug("Failed to load image ");
 		IApplication::Debug(filename.data());
 		return 0;
 	}

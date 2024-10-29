@@ -48,11 +48,70 @@ public:
 	 */
 	bool SetTexture(GLuint program, GLuint texture, uint32_t slot, const std::string_view& uniformName) override;
 
+	static inline bool SetUniformFloat(GLuint program, const char* name, float v)
+	{
+		const GLint location = glGetUniformLocation(program, name);
+		if (location != -1)
+		{
+			glUniform1fv(location, 1, &v);
+		}
+		return location != -1;
+	}
+
+	static inline bool SetUniformVec2(GLuint program, const char* name, const glm::vec2& v)
+	{
+		const GLint location = glGetUniformLocation(program, name);
+		if (location != -1)
+		{
+			glUniform2fv(location, 1, &v.x);
+		}
+		return location != -1;
+	}
+
+	static inline bool SetUniformVec3(GLuint program, const char* name, const glm::vec3& v)
+	{
+		const GLint location = glGetUniformLocation(program, name);
+		if (location != -1)
+		{
+			glUniform3fv(location, 1, &v.x);
+		}
+		return location != -1;
+	}
+
+	static inline bool SetUniformVec4(GLuint program, const char* name, const glm::vec4& v)
+	{
+		const GLint location = glGetUniformLocation(program, name);
+		if (location != -1)
+		{
+			glUniform4fv(location, 1, &v.x);
+		}
+		return location != -1;
+	}
+
+	static inline bool SetUniformMatrix3(GLuint program, const char* name, const glm::mat3& m)
+	{
+		const GLint location = glGetUniformLocation(program, name);
+		if (location != -1)
+		{
+			glUniformMatrix3fv(location, 1, GL_FALSE, &m[0][0]);
+		}
+		return location != -1;
+	}
+
+	static inline bool SetUniformMatrix4(GLuint program, const char* name, const glm::mat4& m)
+	{
+		const GLint location = glGetUniformLocation(program, name);
+		if (location != -1)
+		{
+			glUniformMatrix4fv(location, 1, GL_FALSE, &m[0][0]);
+		}
+		return location != -1;
+	}
+
 	GLuint CreateTexture(const std::string_view& filename);
 
 	GLuint CreateVertexShader(const char* sourceCode);
 	GLuint CreateVertexShaderFromFile(const std::string_view& filename);
-
 	GLuint CreateFragmentShader(const char* sourceCode);
 	GLuint CreateFragmentShaderFromFile(const std::string_view& filename);
 
@@ -60,6 +119,8 @@ public:
 
 	void PrintShaderError(GLuint shader);
 	void PrintProgramError(GLuint program);
+
+
 
 private:
 	/**
@@ -69,7 +130,7 @@ private:
 	static bool InitFunctions();
 	bool SetDefaultSettings();
 
-	HDC			m_Context;		// handle to device context
-	HGLRC		m_Resource;		// handle to resource context
+	HDC			m_Context;
+	HGLRC		m_RC;
 };
 

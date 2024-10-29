@@ -139,6 +139,7 @@
     <ClCompile Include="..\game-engine-core\src\Geometry.cpp" />
     <ClCompile Include="..\game-engine-core\src\IApplication.cpp" />
     <ClCompile Include="..\game-engine-core\src\IRenderer.cpp" />
+    <ClCompile Include="..\game-engine-core\src\Material.cpp" />
     <ClCompile Include="..\game-engine-core\src\OpenGLRenderer.cpp" />
     <ClCompile Include="..\game-engine-core\src\Timer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="..\game-engine-core\include\Geometry.h" />
     <ClInclude Include="..\game-engine-core\include\IApplication.h" />
     <ClInclude Include="..\game-engine-core\include\IRenderer.h" />
+    <ClInclude Include="..\game-engine-core\include\Material.h" />
     <ClInclude Include="..\game-engine-core\include\OpenGLRenderer.h" />
     <ClInclude Include="..\game-engine-core\include\stb_image.h" />
     <ClInclude Include="..\game-engine-core\include\Timer.h" />

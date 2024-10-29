@@ -33,12 +33,14 @@ public:
 	inline int32_t GetHeight() const { return m_iHeight; }
 	inline HWND GetWindow() const { return m_Window; }
 
-	inline bool IsActive() const { return m_bActive;  }
-	void SetActive(bool active);
+	inline bool IsActive() const { return m_bActive; }
+	void SetActive(bool set);
+
+	inline float GetAspect() const { return (float)m_iWidth / (float)m_iHeight; }
 
 	inline float GetFrameTime() const { return m_Timer.GetElapsedSeconds(); }
 
-	static IApplication* GetApp() { return m_pApp;  }
+	static IApplication* GetApp() { return m_pApp; }
 
 	inline IRenderer* GetRenderer() { return m_pRenderer.get(); }
 
@@ -47,18 +49,19 @@ public:
 	static void Debug(const std::string& msg);
 
 protected:
+	virtual void OnScreenChanged(uint32_t widthPixels, uint32_t heightPixels) {}
+
 	virtual bool OnEvent(UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
-	static HWND MakeWindow(int32_t resX, int32_t resY, const std::string& title);
-	static long WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static HWND MakeWindow(int32_t width, int32_t height, const std::string& title);
+	static long WINAPI WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
+	// app data
 	int32_t						m_iWidth;
 	int32_t						m_iHeight;
-
 	bool						m_bActive;
-
 	Timer						m_Timer;
 
 	HWND						m_Window;
@@ -67,3 +70,4 @@ private:
 
 	static IApplication*		m_pApp;
 };
+

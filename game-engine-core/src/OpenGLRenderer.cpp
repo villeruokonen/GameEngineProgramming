@@ -81,7 +81,7 @@ PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
 
 OpenGLRenderer::OpenGLRenderer() :
 	m_Context(nullptr),
-	m_Resource(nullptr)
+	m_RC(nullptr)
 {
 }
 
@@ -90,7 +90,7 @@ OpenGLRenderer::~OpenGLRenderer()
 	if (m_Context)
 	{
 		wglMakeCurrent(m_Context, nullptr);
-		wglDeleteContext(m_Resource);
+		wglDeleteContext(m_RC);
 		::ReleaseDC(IApplication::GetApp()->GetWindow(), m_Context);
 		m_Context = nullptr;
 	}
@@ -133,8 +133,8 @@ bool OpenGLRenderer::Create()
 		return false;
 	}
 
-	m_Resource = wglCreateContext(m_Context);
-	wglMakeCurrent(m_Context, m_Resource);
+	m_RC = wglCreateContext(m_Context);
+	wglMakeCurrent(m_Context, m_RC);
 
 	InitFunctions();
 
@@ -158,217 +158,26 @@ void OpenGLRenderer::Clear(float r, float g, float b, float a, float depth, int3
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
+
 void OpenGLRenderer::SetViewport(const glm::ivec4& area)
 {
 	glViewport(area.x, area.y, area.z, area.w);
 }
 
+
 bool OpenGLRenderer::SetTexture(uint32_t program, uint32_t texture, uint32_t slot, const std::string_view& uniformName)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, texture);
-
 	const GLint location = glGetUniformLocation(program, uniformName.data());
 	if (location >= 0)
 	{
 		glUniform1i(location, slot);
 		return true;
 	}
-
 	return false;
 }
 
-GLuint OpenGLRenderer::CreateTexture(const std::string_view& filename)
-{
-	GLuint textureHandle = 0;
-	int32_t width = 0;
-	int32_t height = 0;
-	int32_t bitsPerPixel = 0;
-	uint8_t* imgData = stbi_load(filename.data(), &width, &height, &bitsPerPixel, STBI_rgb_alpha);
-
-	if (!imgData || !width || !height || !bitsPerPixel)
-	{
-		// failed to load image file
-		IApplication::Debug("Failed to load image ");
-		IApplication::Debug(filename.data());
-		return 0;
-	}
-
-	// premultiply alpha for faster blending
-	const int32_t imgDataBytes = width * height * 4;
-	for (int32_t i = 0; i < imgDataBytes; i += 4)
-	{
-		const int32_t alpha = imgData[i + 3];
-		if (alpha != 255)
-		{
-			imgData[i] = imgData[i] * alpha / 255;
-			imgData[i + 1] = imgData[i + 1] * alpha / 255;
-			imgData[i + 2] = imgData[i + 2] * alpha / 255;
-		}
-	}
-
-	GLint internalFormat = GL_RGBA;
-	GLenum format = GL_RGBA;
-	GLenum err = glGetError(); // clear error buffer
-
-	glGenTextures(1, &textureHandle);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureHandle);
-
-	glTexImage2D(GL_TEXTURE_2D,
-		0,
-		internalFormat,
-		width,
-		height,
-		0,
-		format,
-		GL_UNSIGNED_BYTE,
-		imgData);
-
-	delete[] imgData; // delete pixel block
-
-	err = glGetError();
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	return textureHandle;
-}
-
-GLuint OpenGLRenderer::CreateVertexShader(const char* sourceCode)
-{
-	GLuint shaderHandle = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(shaderHandle, 1, (const char**)&sourceCode, nullptr);
-	glCompileShader(shaderHandle);
-
-	// check if compilation successful
-	GLint shaderCompiled = 0;
-	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &shaderCompiled);
-
-	if (!shaderCompiled)
-	{
-		IApplication::Debug("Failed to compile vertex shader: ");
-		PrintShaderError(shaderHandle);
-		glDeleteShader(shaderHandle);
-
-		shaderHandle = 0;
-	}
-
-	return shaderHandle;
-}
-
-GLuint OpenGLRenderer::CreateVertexShaderFromFile(const std::string_view& filename)
-{
-	std::ifstream f(filename.data(), std::ios::binary);
-	std::vector<char> bytes(
-		(std::istreambuf_iterator<char>(f)),
-		(std::istreambuf_iterator<char>()));
-
-	bytes.push_back(0); // add null terminator in case it is not there
-
-	return CreateVertexShader(bytes.data());
-}
-
-GLuint OpenGLRenderer::CreateFragmentShader(const char* sourceCode)
-{
-	GLuint shaderHandle = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(shaderHandle, 1, (const char**)&sourceCode, nullptr);
-	glCompileShader(shaderHandle);
-
-	// check if compilation successful
-	GLint shaderCompiled = 0;
-	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &shaderCompiled);
-
-	if (!shaderCompiled)
-	{
-		IApplication::Debug("Failed to compile fragment shader: ");
-		PrintShaderError(shaderHandle);
-		glDeleteShader(shaderHandle);
-
-		shaderHandle = 0;
-	}
-
-	return shaderHandle;
-}
-
-GLuint OpenGLRenderer::CreateFragmentShaderFromFile(const std::string_view& filename)
-{
-	std::ifstream f(filename.data(), std::ios::binary);
-	std::vector<char> bytes(
-		(std::istreambuf_iterator<char>(f)),
-		(std::istreambuf_iterator<char>()));
-
-	bytes.push_back(0); // add null terminator in case it is not there
-
-	return CreateFragmentShader(bytes.data());
-}
-
-GLuint OpenGLRenderer::CreateProgram(GLuint vertexShader, GLuint fragmentShader)
-{
-	GLuint programHandle = glCreateProgram();
-
-	glAttachShader(programHandle, fragmentShader);
-	glAttachShader(programHandle, vertexShader);
-
-	glLinkProgram(programHandle);
-
-	GLint linked = 0;
-	glGetProgramiv(programHandle, GL_LINK_STATUS, &linked);
-
-	if (!linked)
-	{
-		IApplication::Debug("Failed to link program: ");
-		PrintProgramError(programHandle);
-		glDeleteProgram(programHandle);
-		programHandle = 0;
-	}
-
-	return programHandle;
-}
-
-void OpenGLRenderer::PrintShaderError(GLuint shader)
-{
-	GLint infoLogLength = 0;
-	GLint charsWritten = 0;
-
-	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-	if (infoLogLength)
-	{
-		char* infoLog = new char[infoLogLength + 1];
-		memset(infoLog, 0, infoLogLength + 1);
-
-		glGetShaderInfoLog(shader, infoLogLength, &charsWritten, infoLog);
-
-		IApplication::Debug(infoLog);
-
-		delete[] infoLog;
-	}
-}
-
-void OpenGLRenderer::PrintProgramError(GLuint program)
-{
-	GLint infoLogLength = 0;
-	GLint charsWritten = 0;
-
-	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-	if (infoLogLength)
-	{
-		char* infoLog = new char[infoLogLength + 1];
-		memset(infoLog, 0, infoLogLength + 1);
-
-		glGetProgramInfoLog(program, infoLogLength, &charsWritten, infoLog);
-
-		IApplication::Debug(infoLog);
-
-		delete[] infoLog;
-	}
-}
 
 bool OpenGLRenderer::SetDefaultSettings()
 {
@@ -401,6 +210,178 @@ bool OpenGLRenderer::SetDefaultSettings()
 	return true;
 }
 
+
+
+GLuint OpenGLRenderer::CreateTexture(const std::string_view& filename)
+{
+	GLuint textureHandle = 0;
+	int32_t textureWidth = 0;
+	int32_t textureHeight = 0;
+	int32_t bpp = 0;
+	uint8_t* imgdata = stbi_load(filename.data(), &textureWidth, &textureHeight, &bpp, STBI_rgb_alpha);
+	if (!imgdata || !textureWidth || !textureHeight || !bpp)
+	{
+		// failed to load image file
+		IApplication::Debug("Failed to load image");
+		IApplication::Debug(filename.data());
+		return 0;
+	}
+
+	// premultiply the alpha for faster blending
+	const int32_t imgdatabytes = textureWidth * textureHeight * 4;
+	for (int32_t i = 0; i < imgdatabytes; i += 4)
+	{
+		const int32_t alpha = imgdata[i + 3];
+		if (alpha != 255)
+		{
+			imgdata[i] = imgdata[i] * alpha / 255;
+			imgdata[i + 1] = imgdata[i + 1] * alpha / 255;
+			imgdata[i + 2] = imgdata[i + 2] * alpha / 255;
+		}
+	}
+
+	GLint internalFormat = GL_RGBA;
+	GLenum format = GL_RGBA;
+	GLenum err = glGetError();
+
+	glGenTextures(1, &textureHandle);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+	glTexImage2D(GL_TEXTURE_2D,
+		0,
+		internalFormat,
+		textureWidth,
+		textureHeight,
+		0,
+		format,
+		GL_UNSIGNED_BYTE,
+		imgdata);
+
+	delete[] imgdata;
+
+	err = glGetError();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	return textureHandle;
+}
+
+GLuint OpenGLRenderer::CreateVertexShader(const char* sourceCode)
+{
+	GLuint shaderHandle = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(shaderHandle, 1, (const char**)&sourceCode, nullptr);
+	glCompileShader(shaderHandle);
+
+	// check if success
+	GLint shaderCompiled = 0;
+	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &shaderCompiled);
+	if (!shaderCompiled)
+	{
+		IApplication::Debug("Failed to compile vertex shader:");
+		PrintShaderError(shaderHandle);
+		glDeleteShader(shaderHandle);
+		shaderHandle = 0;
+	}
+	return shaderHandle;
+}
+
+GLuint OpenGLRenderer::CreateVertexShaderFromFile(const std::string_view& filename)
+{
+	std::ifstream f(filename.data(), std::ios::binary);
+	std::vector<char> bytes(
+		(std::istreambuf_iterator<char>(f)),
+		(std::istreambuf_iterator<char>()));
+	bytes.push_back(0);
+
+	return CreateVertexShader(bytes.data());
+}
+
+GLuint OpenGLRenderer::CreateFragmentShader(const char* sourceCode)
+{
+	GLuint shaderHandle = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(shaderHandle, 1, (const char**)&sourceCode, nullptr);
+	glCompileShader(shaderHandle);
+
+	// check if success
+	GLint shaderCompiled = 0;
+	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &shaderCompiled);
+	if (!shaderCompiled)
+	{
+		IApplication::Debug("Failed to compile fragment shader:");
+		PrintShaderError(shaderHandle);
+		glDeleteShader(shaderHandle);
+		shaderHandle = 0;
+	}
+	return shaderHandle;
+}
+
+GLuint OpenGLRenderer::CreateFragmentShaderFromFile(const std::string_view& filename)
+{
+	std::ifstream f(filename.data(), std::ios::binary);
+	std::vector<char> bytes(
+		(std::istreambuf_iterator<char>(f)),
+		(std::istreambuf_iterator<char>()));
+	bytes.push_back(0);
+
+	return CreateFragmentShader(bytes.data());
+}
+
+GLuint OpenGLRenderer::CreateProgram(GLuint vertexShader, GLuint fragmentShader)
+{
+	GLuint programHandle = glCreateProgram();
+	glAttachShader(programHandle, fragmentShader);
+	glAttachShader(programHandle, vertexShader);
+	glLinkProgram(programHandle);
+
+	GLint linked = 0;
+	glGetProgramiv(programHandle, GL_LINK_STATUS, &linked);
+	if (!linked)
+	{
+		IApplication::Debug("Failed to link program: ");
+		PrintProgramError(programHandle);
+		glDeleteProgram(programHandle);
+		programHandle = 0;
+	}
+
+	return programHandle;
+}
+
+void OpenGLRenderer::PrintShaderError(GLuint shader)
+{
+	GLint infologLength = 0;
+	GLint charsWritten = 0;
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLength);
+	if (infologLength)
+	{
+		char* infoLog = new char[infologLength + 1];
+		memset(infoLog, 0, infologLength + 1);
+		glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
+		IApplication::Debug(infoLog);
+		delete[] infoLog;
+	}
+}
+
+void OpenGLRenderer::PrintProgramError(GLuint program)
+{
+	GLint infologLength = 0;
+	GLint charsWritten = 0;
+	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infologLength);
+	if (infologLength)
+	{
+		char* infoLog = new char[infologLength + 1];
+		memset(infoLog, 0, infologLength + 1);
+		glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
+		IApplication::Debug(infoLog);
+		delete[] infoLog;
+	}
+}
+
+
+
 bool OpenGLRenderer::InitFunctions()
 {
 #if defined (_WINDOWS)
@@ -413,15 +394,15 @@ bool OpenGLRenderer::InitFunctions()
 #endif
 
 #if defined (_WINDOWS)
-	glBlendEquation = (PFNGLBLENDEQUATIONPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendEquation");
+	glBlendEquation	= (PFNGLBLENDEQUATIONPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendEquation");
 	glActiveTexture = (PFNGLACTIVETEXTUREPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glActiveTexture");
-	glCompressedTexImage2D = (PFNGLCOMPRESSEDTEXIMAGE2D)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glCompressedTexImage2D");
-	glBlendColor = (PFNGLBLENDCOLORPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendColor");
+	glCompressedTexImage2D		= (PFNGLCOMPRESSEDTEXIMAGE2D		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glCompressedTexImage2D");
+	glBlendColor			= (PFNGLBLENDCOLORPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendColor");
 	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
 #endif
 
 	glBlendEquationSeparate = (PFNGLBLENDEQUATIONSEPARATEPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendEquationSeparate");
-	glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendFuncSeparate");
+	glBlendFuncSeparate		= (PFNGLBLENDFUNCSEPARATEPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBlendFuncSeparate");
 
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGetProgramInfoLog");
 
@@ -479,19 +460,19 @@ bool OpenGLRenderer::InitFunctions()
 	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glVertexAttribIPointer");
 
 
-	glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGenFramebuffers");
-	glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGenRenderbuffers");
-	glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glDeleteFramebuffers");
-	glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glDeleteRenderbuffers");
-	glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBindFramebuffer");
-	glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBindRenderbuffer");
-	glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glRenderbufferStorage");
-	glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glFramebufferTexture2D");
-	glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glFramebufferTexture");
-	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glFramebufferRenderbuffer");
-	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glCheckFramebufferStatus");
-	glClearDepthf = (PFNGLCLEARDEPTHFPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glClearDepthf");
-	glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGenerateMipmap");
+	glGenFramebuffers			= (PFNGLGENFRAMEBUFFERSPROC			) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGenFramebuffers");
+	glGenRenderbuffers			= (PFNGLGENRENDERBUFFERSPROC		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGenRenderbuffers");
+	glDeleteFramebuffers		= (PFNGLDELETEFRAMEBUFFERSPROC		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glDeleteFramebuffers");
+	glDeleteRenderbuffers		= (PFNGLDELETERENDERBUFFERSPROC		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glDeleteRenderbuffers");
+	glBindFramebuffer			= (PFNGLBINDFRAMEBUFFERPROC			) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBindFramebuffer");
+	glBindRenderbuffer			= (PFNGLBINDRENDERBUFFERPROC		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glBindRenderbuffer");
+	glRenderbufferStorage		= (PFNGLRENDERBUFFERSTORAGEPROC		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glRenderbufferStorage");
+	glFramebufferTexture2D		= (PFNGLFRAMEBUFFERTEXTURE2DPROC	) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glFramebufferTexture2D");
+	glFramebufferTexture		= (PFNGLFRAMEBUFFERTEXTUREPROC		) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glFramebufferTexture");
+	glFramebufferRenderbuffer	= (PFNGLFRAMEBUFFERRENDERBUFFERPROC ) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glFramebufferRenderbuffer");
+	glCheckFramebufferStatus	= (PFNGLCHECKFRAMEBUFFERSTATUSPROC	) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glCheckFramebufferStatus");
+	glClearDepthf				= (PFNGLCLEARDEPTHFPROC				) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glClearDepthf");
+	glGenerateMipmap			= (PFNGLGENERATEMIPMAPPROC			) GL_GETPROCADDRESS((GL_GETPROCADDRESS_PARAM_TYPE)"glGenerateMipmap");
 
 	// check that functions were loaded properly
 	if (!glCreateProgram)

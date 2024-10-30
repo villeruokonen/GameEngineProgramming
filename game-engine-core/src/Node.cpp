@@ -2,19 +2,32 @@
 
 Node::Node() :
 	m_mModel(1.0f),
-	m_pParent(nullptr)
+	m_pParent(nullptr),
+	m_vVelocity({ 0, 0, 0 }),
+	m_vAcceleration({ 0, 0, 0 }),
+	m_fRadius(1.0f)
 {
 }
 
 Node::Node(const std::string_view name) :
 	m_mModel(1.0f),
 	m_pParent(nullptr),
+	m_vVelocity({ 0, 0, 0 }),
+	m_vAcceleration({ 0, 0, 0 }),
+	m_fRadius(1.0f),
 	m_strName(name)
 {
 }
 
 void Node::Update(float frameTime)
 {
+	m_vVelocity += m_vAcceleration * frameTime;
+
+	auto pos = GetPos();
+	pos += m_vVelocity * frameTime;
+
+	SetPos(pos);
+
 	// Update child nodes
 	for (auto& node : m_arrNodes)
 	{

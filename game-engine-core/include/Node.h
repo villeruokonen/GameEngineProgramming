@@ -42,11 +42,25 @@ public:
 				: m_mModel;
 	}
 
+	inline auto& Velocity() { return m_vVelocity; }
+	inline void SetVelocity(const glm::vec3& velocity) { m_vVelocity = velocity; }
+
+	inline auto& Acceleration() { return m_vAcceleration; }
+	inline void SetAcceleration(const glm::vec3& acceleration) { m_vAcceleration = acceleration; }
+
+	inline float GetRadius() const { return m_fRadius; }
+	inline void SetRadius(float radius) { m_fRadius = radius; }
+
 protected:
 	glm::mat4							m_mModel;
 
 	Node*								m_pParent;
 	std::vector<std::shared_ptr<Node>>	m_arrNodes;
+
+	glm::vec3							m_vVelocity;
+	glm::vec3							m_vAcceleration;
+
+	float								m_fRadius;
 
 private:
 	std::string							m_strName;

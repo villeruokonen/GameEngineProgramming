@@ -1,5 +1,6 @@
 #pragma once
 #include "../game-engine-core/include/IApplication.h"
+#include "../game-engine-core/include/GeometryNode.h"
 #include "../game-engine-core/include/Geometry.h"
 #include "../game-engine-core/include/Material.h"
 
@@ -29,7 +30,7 @@ private:
 	std::shared_ptr<Geometry>		m_pSphere;
 	std::shared_ptr<Material>		m_pMaterial;
 
-	glm::mat4						m_mModel;
+	std::unique_ptr<Node>			m_pSceneRoot;
 };
 
 

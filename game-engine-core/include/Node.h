@@ -51,6 +51,25 @@ public:
 	inline float GetRadius() const { return m_fRadius; }
 	inline void SetRadius(float radius) { m_fRadius = radius; }
 
+	inline void RotateAxisAngle(const glm::vec3& axis, float angle)
+	{
+		m_vRotationAxis = glm::normalize(axis);
+		m_fRotationAngle = angle;
+
+		auto pos = GetPos();
+		m_mModel = glm::rotate(glm::mat4(1.0f), m_fRotationAngle, m_vRotationAxis);
+		SetPos(pos);
+	}
+
+	inline auto& RotationAxis() { return m_vRotationAxis; }
+	inline void SetRotationAxis(const glm::vec3& axis) { RotateAxisAngle(axis, m_fRotationAngle); }
+
+	inline float GetRotationAngle() const { return m_fRotationAngle; }
+	inline void SetRotationAngle(float angle) { RotateAxisAngle(m_vRotationAxis, angle); }
+
+	inline float GetRotationSpeed() const { return m_fRotationSpeed; }
+	inline void SetRotationSpeed(float speed) { m_fRotationSpeed = speed; }
+
 protected:
 	glm::mat4							m_mModel;
 
@@ -59,6 +78,10 @@ protected:
 
 	glm::vec3							m_vVelocity;
 	glm::vec3							m_vAcceleration;
+
+	glm::vec3							m_vRotationAxis;
+	float								m_fRotationAngle;
+	float								m_fRotationSpeed;
 
 	float								m_fRadius;
 

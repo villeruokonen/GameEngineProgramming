@@ -17,9 +17,12 @@ public:
 
 protected:
 	void OnScreenChanged(uint32_t widthPixels, uint32_t heightPixels) override;
+	bool OnKeyDown(uint32_t keyCode) override;
 
 private:
 	OpenGLRenderer* GetOpenGLRenderer() { return static_cast<OpenGLRenderer*>(GetRenderer()); }
+
+	void SetRandomRotation(Node& node) const;
 
 	GLuint							m_uVertexShader;
 	GLuint							m_uFragmentShader;

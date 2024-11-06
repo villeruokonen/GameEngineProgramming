@@ -24,6 +24,8 @@ public:
 
 	void Run();
 
+	void Close();
+
 	virtual bool OnCreate() = 0;
 	virtual void OnDestroy() = 0;
 	virtual void OnUpdate(float frametime) = 0;
@@ -48,14 +50,28 @@ public:
 	static void Debug(const char* msg);
 	static void Debug(const std::string& msg);
 
+	static bool IsKeyDown(uint32_t keyCode);
+
+	const glm::vec2& GetMousePosDelta() const { return m_vMousePosDelta; }
+	bool IsMouseButtonDown(uint32_t buttonIndex) const;
+
 protected:
 	virtual void OnScreenChanged(uint32_t widthPixels, uint32_t heightPixels) {}
+	virtual bool OnKeyDown(uint32_t keyCode) { return false; }
+
+	virtual bool OnMouseBegin(int32_t buttonIndex, const glm::vec2& point) { return false; }
+	virtual bool OnMouseDrag(int32_t buttonIndex, const glm::vec2& point) { return false; }
+	virtual bool OnMouseEnd(int32_t buttonIndex, const glm::vec2& point) { return false; }
 
 	virtual bool OnEvent(UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
 	static HWND MakeWindow(int32_t width, int32_t height, const std::string& title);
 	static long WINAPI WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	static void InitMouse(HWND hwnd);
+	static glm::vec2 ReadMouse(uint8_t* buttons);
+	static void ReleaseMouse();
 
 private:
 	// app data
@@ -65,6 +81,9 @@ private:
 	Timer						m_Timer;
 
 	HWND						m_Window;
+
+	glm::vec2					m_vMousePosDelta;
+	uint8_t						m_MouseButtonStates[8];
 
 	std::unique_ptr<IRenderer>	m_pRenderer;
 

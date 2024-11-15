@@ -44,7 +44,7 @@ public:
 		* GetStride
 		* @return number of bytes allocated by one vertex
 		*/
-		static constexpr int GetStride() { return sizeof(VERTEX); }
+		static constexpr int GetStride() { return 32; }
 
 		float	x, y, z;
 		float	nx, ny, nz;

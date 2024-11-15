@@ -52,7 +52,7 @@ public:
 
 	static bool IsKeyDown(uint32_t keyCode);
 
-	const glm::vec2& GetMousePosDelta() const { return m_vMousePosDelta; }
+	const glm::vec2& GetMousePosDelta() const { return m_MousePosDelta; }
 	bool IsMouseButtonDown(uint32_t buttonIndex) const;
 
 protected:
@@ -80,10 +80,10 @@ private:
 	bool						m_bActive;
 	Timer						m_Timer;
 
-	HWND						m_Window;
-
-	glm::vec2					m_vMousePosDelta;
+	glm::vec2					m_MousePosDelta;
 	uint8_t						m_MouseButtonStates[8];
+
+	HWND						m_Window;
 
 	std::unique_ptr<IRenderer>	m_pRenderer;
 

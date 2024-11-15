@@ -1,6 +1,8 @@
 #pragma once
 #include "../game-engine-core/include/IApplication.h"
 #include "../game-engine-core/include/GeometryNode.h"
+#include "../game-engine-core/include/CameraNode.h"
+#include "../game-engine-core/include/WasdControllerNode.h"
 #include "../game-engine-core/include/Geometry.h"
 #include "../game-engine-core/include/Material.h"
 

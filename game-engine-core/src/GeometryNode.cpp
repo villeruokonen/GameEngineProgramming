@@ -19,6 +19,7 @@ void GeometryNode::Render(IRenderer& renderer, GLuint program)
 			m_pMaterial->SetToProgram(program);
 		}
 
+		// set the textures
 		char name[16] = "texture01";
 		for (uint32_t slot = 0; slot < m_arrTextures.size(); ++slot)
 		{
@@ -30,7 +31,7 @@ void GeometryNode::Render(IRenderer& renderer, GLuint program)
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_arrTextureWrapModes[slot]);
 			}
 
-			++name[8]; // Bruh
+			++name[8];
 		}
 
 		m_pGeometry->Draw(renderer);
@@ -38,3 +39,4 @@ void GeometryNode::Render(IRenderer& renderer, GLuint program)
 
 	Node::Render(renderer, program);
 }
+

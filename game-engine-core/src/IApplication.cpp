@@ -6,8 +6,8 @@ IApplication* IApplication::m_pApp = nullptr;
 IApplication::IApplication() :
     m_iWidth(0),
     m_iHeight(0),
+    m_MousePosDelta(0.0f),
     m_bActive(false),
-	m_vMousePosDelta(0.0f),
     m_Window(nullptr)
 {
     m_pApp = this;
@@ -27,7 +27,7 @@ bool IApplication::Create(int32_t resX, int32_t resY, const std::string& title)
         m_iWidth = resX;
         m_iHeight = resY;
 
-        // init mouse
+        // init the mouse
         InitMouse(m_Window);
 
         // create our renderer object
@@ -77,8 +77,8 @@ void IApplication::Run()
             m_Timer.EndTimer();
             m_Timer.BeginTimer();
 
-            // read mouse delta and buttons
-            m_vMousePosDelta = ReadMouse(m_MouseButtonStates);
+            // read mouse status
+            m_MousePosDelta = ReadMouse(m_MouseButtonStates);
 
             // this is actual timed main loop of the app
             OnUpdate(m_Timer.GetElapsedSeconds());
@@ -88,12 +88,13 @@ void IApplication::Run()
         }
     }
 
-    // Release mouse and directinput
+    // release mouse and direct input
     ReleaseMouse();
 
     OnDestroy();
     m_pRenderer = nullptr;
 }
+
 
 void IApplication::Close()
 {
@@ -190,18 +191,14 @@ bool IApplication::OnEvent(UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_MOUSEMOVE:
-        { // Must set scope for local variable use
-            int32_t buttonIndex = -1;
-            if ((wParam & MK_LBUTTON) != 0)
-                buttonIndex = 0;
-            else if ((wParam & MK_MBUTTON) != 0)
-                buttonIndex = 1;
-            else if ((wParam & MK_RBUTTON) != 0)
-                buttonIndex = 2;
-
-            if (buttonIndex != -1)
+        {
+            int32_t pointerIndex = -1;
+            if ((wParam & MK_LBUTTON) != 0) pointerIndex = 0;
+            else if ((wParam & MK_MBUTTON) != 0) pointerIndex = 1;
+            else if ((wParam & MK_RBUTTON) != 0) pointerIndex = 2;
+            if (pointerIndex != -1)
             {
-                OnMouseDrag(buttonIndex, glm::vec2(LOWORD(lParam), HIWORD(lParam)));
+                OnMouseDrag(pointerIndex, glm::vec2(LOWORD(lParam), HIWORD(lParam)));
             }
         }
         break;
@@ -316,7 +313,8 @@ long __stdcall IApplication::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
     return 0;
 }
 
-// High performance mouse with DirectInput
+
+// high performance mouse with DirectInput
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #pragma comment(lib, "dxguid.lib")
@@ -327,10 +325,8 @@ LPDIRECTINPUTDEVICE8 g_pMouse = nullptr;
 
 void IApplication::InitMouse(HWND hwnd)
 {
-    // Create directinput COM object
     DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (VOID**)&g_pDI, NULL);
-
-	g_pDI->CreateDevice(GUID_SysMouse, &g_pMouse, NULL);
+    g_pDI->CreateDevice(GUID_SysMouse, &g_pMouse, NULL);
     g_pMouse->SetDataFormat(&c_dfDIMouse2);
     g_pMouse->SetCooperativeLevel(hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
     g_pMouse->Acquire();
@@ -346,7 +342,6 @@ glm::vec2 IApplication::ReadMouse(uint8_t* buttons)
         std::memset(&dims2, 0, sizeof(dims2));
 
         HRESULT hr = g_pMouse->GetDeviceState(sizeof(DIMOUSESTATE2), &dims2);
-
         if (FAILED(hr))
         {
             hr = g_pMouse->Acquire();
@@ -355,8 +350,6 @@ glm::vec2 IApplication::ReadMouse(uint8_t* buttons)
         {
             mouseDelta.x = (float)dims2.lX;
             mouseDelta.y = (float)dims2.lY;
-
-            // Copy buttons to array
             std::memcpy(buttons, dims2.rgbButtons, 8);
         }
     }
@@ -372,7 +365,6 @@ void IApplication::ReleaseMouse()
         g_pMouse->Release();
         g_pMouse = nullptr;
     }
-
     if (g_pDI)
     {
         g_pDI->Release();

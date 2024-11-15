@@ -136,6 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\game-engine-core\src\CameraNode.cpp" />
     <ClCompile Include="..\game-engine-core\src\Geometry.cpp" />
     <ClCompile Include="..\game-engine-core\src\GeometryNode.cpp" />
     <ClCompile Include="..\game-engine-core\src\IApplication.cpp" />
@@ -144,10 +145,12 @@
     <ClCompile Include="..\game-engine-core\src\Node.cpp" />
     <ClCompile Include="..\game-engine-core\src\OpenGLRenderer.cpp" />
     <ClCompile Include="..\game-engine-core\src\Timer.cpp" />
+    <ClCompile Include="..\game-engine-core\src\WasdControllerNode.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TheApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\game-engine-core\include\CameraNode.h" />
     <ClInclude Include="..\game-engine-core\include\Geometry.h" />
     <ClInclude Include="..\game-engine-core\include\GeometryNode.h" />
     <ClInclude Include="..\game-engine-core\include\IApplication.h" />
@@ -157,6 +160,7 @@
     <ClInclude Include="..\game-engine-core\include\OpenGLRenderer.h" />
     <ClInclude Include="..\game-engine-core\include\stb_image.h" />
     <ClInclude Include="..\game-engine-core\include\Timer.h" />
+    <ClInclude Include="..\game-engine-core\include\WasdControllerNode.h" />
     <ClInclude Include="TheApp.h" />
   </ItemGroup>
   <ItemGroup>

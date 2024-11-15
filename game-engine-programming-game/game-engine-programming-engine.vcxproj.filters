@@ -57,6 +57,12 @@
     <ClCompile Include="..\game-engine-core\src\GeometryNode.cpp">
       <Filter>Source Files\core\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\game-engine-core\src\WasdControllerNode.cpp">
+      <Filter>Source Files\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game-engine-core\src\CameraNode.cpp">
+      <Filter>Source Files\core\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game-engine-core\include\IApplication.h">
@@ -87,6 +93,12 @@
       <Filter>Header Files\core\include</Filter>
     </ClInclude>
     <ClInclude Include="..\game-engine-core\include\GeometryNode.h">
+      <Filter>Header Files\core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game-engine-core\include\WasdControllerNode.h">
+      <Filter>Header Files\core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game-engine-core\include\CameraNode.h">
       <Filter>Header Files\core\include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -148,6 +148,7 @@
     <ClInclude Include="..\game-engine-core\include\WasdControllerNode.h" />
     <ClInclude Include="BowlingApp.h" />
     <ClInclude Include="Physics.h" />
+    <ClInclude Include="PhysicsNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\game-engine-core\src\CameraNode.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="BowlingApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="PhysicsNode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

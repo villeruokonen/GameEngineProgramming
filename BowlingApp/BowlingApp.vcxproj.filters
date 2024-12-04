@@ -60,6 +60,9 @@
     <ClInclude Include="..\game-engine-core\include\WasdControllerNode.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="PhysicsNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BowlingApp.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="..\game-engine-core\src\WasdControllerNode.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsNode.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

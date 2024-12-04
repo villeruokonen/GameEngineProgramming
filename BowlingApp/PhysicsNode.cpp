@@ -11,7 +11,7 @@ PhysicsNode::~PhysicsNode()
 }
 
 
-void PhysicsNode::SetPhysics(std::shared_ptr<Physics>& physics, float mass, CollisionShape shape)
+void PhysicsNode::SetPhysics(std::shared_ptr<Physics>& physics, float mass, CollisionShape shape, const glm::vec3& size)
 {
 	if (physics)
 	{
@@ -24,7 +24,7 @@ void PhysicsNode::SetPhysics(std::shared_ptr<Physics>& physics, float mass, Coll
 			break;
 
 		case CollisionShape::Box:
-			m_Collision.m_pShape = std::make_unique<btBoxShape>(btVector3(GetRadius(), GetRadius(), GetRadius()));
+			m_Collision.m_pShape = std::make_unique<btBoxShape>(btVector3(size.x, size.y, size.z));
 			break;
 
 		case CollisionShape::Sphere:

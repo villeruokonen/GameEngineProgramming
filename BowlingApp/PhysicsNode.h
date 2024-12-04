@@ -23,9 +23,13 @@ public:
 
     ~PhysicsNode();
 
-    void SetPhysics(std::shared_ptr<Physics>& physics, float mass, CollisionShape shape);
+    void SetPhysics(std::shared_ptr<Physics>& physics, 
+        float mass, CollisionShape shape, 
+        const glm::vec3& size = glm::vec3(1.0f));
 
     void Update(float frametime) override;
+
+    inline btRigidBody* GetRigidBody() { return m_Collision.m_pRigidBody.get(); }
 
 private:
     std::shared_ptr<Physics>            m_pPhysics;
